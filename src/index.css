@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	html {
+		scroll-behavior: smooth;
+	}
+
+	body {
+		@apply bg-[#050816] text-slate-100 antialiased;
+	}
+
+	::selection {
+		background: rgba(251, 191, 36, 0.35);
+		color: #fff8e6;
+	}
+}
+
+@layer utilities {
+	.scrollbar-cosmic {
+		scrollbar-width: thin;
+		scrollbar-color: rgba(251, 191, 36, 0.7) rgba(255, 255, 255, 0.04);
+	}
+
+	.scrollbar-cosmic::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	.scrollbar-cosmic::-webkit-scrollbar-track {
+		background: rgba(255, 255, 255, 0.04);
+		border-radius: 999px;
+	}
+
+	.scrollbar-cosmic::-webkit-scrollbar-thumb {
+		border-radius: 999px;
+		background: linear-gradient(180deg, rgba(251, 191, 36, 0.9), rgba(249, 115, 22, 0.8));
+		border: 2px solid rgba(8, 11, 22, 0.8);
+	}
+
+	.scrollbar-cosmic::-webkit-scrollbar-thumb:hover {
+		background: linear-gradient(180deg, rgba(253, 224, 71, 0.95), rgba(251, 146, 60, 0.9));
+	}
+}
