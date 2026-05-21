@@ -1,5 +1,5 @@
 // src/components/FreeServicesSection.tsx
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -68,6 +68,9 @@ const services: Service[] = [
 const GOLD = "#b8860b";        // DarkGoldenrod — rich gold
 const GOLD_LIGHT = "#fefce8";  // yellow-50 equivalent
 const GOLD_BORDER = "#fde68a"; // yellow-200 equivalent
+
+const SLIDE_DURATION = 650;
+const SLIDE_EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
 
 // ─── Desktop carousel constants ───────────────────────────────────────────────
 const CARD_W = 260;
@@ -146,7 +149,13 @@ function MobileCarousel() {
   const onTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
     const delta = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 40) delta > 0 ? next() : prev();
+    if (Math.abs(delta) > 40) {
+      if (delta > 0) {
+        next();
+      } else {
+        prev();
+      }
+    }
     touchStartX.current = null;
   };
 
@@ -162,7 +171,9 @@ function MobileCarousel() {
           className="flex will-change-transform"
           style={{
             transform: `translateX(-${index * 100}%)`,
-            transition: animated ? "transform 500ms ease-in-out" : "none",
+            transition: animated
+              ? `transform ${SLIDE_DURATION}ms ${SLIDE_EASE}`
+              : "none",
           }}
           onTransitionEnd={onTransitionEnd}
         >
@@ -200,27 +211,63 @@ function MobileCarousel() {
 // Silently teleport when scrolling past the outer copies.
 function DesktopCarousel() {
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const singleWidthRef = useRef(0);
+  const stepRef = useRef(STEP);
+  const rafRef = useRef<number | null>(null);
 
   const initScroll = useCallback((el: HTMLDivElement | null) => {
     if (!el) return;
     trackRef.current = el;
-    el.scrollLeft = services.length * STEP;
+    requestAnimationFrame(() => {
+      const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || "0");
+      const firstCard = el.firstElementChild as HTMLElement | null;
+      if (firstCard) {
+        stepRef.current = firstCard.getBoundingClientRect().width + gap;
+      }
+      singleWidthRef.current = el.scrollWidth / 3;
+      el.scrollLeft = singleWidthRef.current;
+    });
   }, []);
 
   const handleScroll = useCallback(() => {
     const el = trackRef.current;
     if (!el) return;
-    const singleWidth = services.length * STEP;
-    if (el.scrollLeft >= singleWidth * 2) el.scrollLeft -= singleWidth;
-    if (el.scrollLeft < singleWidth) el.scrollLeft += singleWidth;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      const singleWidth = singleWidthRef.current;
+      if (!singleWidth) return;
+      if (el.scrollLeft < singleWidth) {
+        el.scrollLeft += singleWidth;
+      } else if (el.scrollLeft >= singleWidth * 2) {
+        el.scrollLeft -= singleWidth;
+      }
+    });
   }, []);
 
   const scroll = (dir: "left" | "right") => {
     trackRef.current?.scrollBy({
-      left: dir === "right" ? STEP : -STEP,
+      left: dir === "right" ? stepRef.current : -stepRef.current,
       behavior: "smooth",
     });
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      const el = trackRef.current;
+      if (!el) return;
+      const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || "0");
+      const firstCard = el.firstElementChild as HTMLElement | null;
+      if (firstCard) {
+        stepRef.current = firstCard.getBoundingClientRect().width + gap;
+      }
+      singleWidthRef.current = el.scrollWidth / 3;
+      el.scrollLeft = singleWidthRef.current;
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div className="hidden md:block max-w-6xl mx-auto relative px-10">
@@ -245,7 +292,7 @@ function DesktopCarousel() {
         ref={initScroll}
         onScroll={handleScroll}
         className="
-          flex gap-5 overflow-x-auto scroll-smooth
+          flex gap-5 overflow-x-auto
           [&::-webkit-scrollbar]:hidden
           [scrollbar-width:none]
           [-ms-overflow-style:none]
@@ -280,18 +327,12 @@ function DesktopCarousel() {
 // ─── Section ──────────────────────────────────────────────────────────────────
 export default function FreeServicesSection() {
   return (
-    <section className="bg-white py-10 md:py-16">
+    <section className="bg-white py-10 md:py-16 pb-10">
       <div className="max-w-6xl mx-auto text-center mb-8 md:mb-10 px-4">
-        <h2
-          className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-wide"
-          style={{ color: GOLD }}
-        >
-          Complimentary Astrology Services
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#b8860b]">
+          Try Before You Talk
         </h2>
-        <div
-          className="mx-auto mt-3 h-[2px] w-16 rounded-xl"
-          style={{ background: `linear-gradient(to right, #d4a017, ${GOLD})` }}
-        />
+        <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
       </div>
 
       <MobileCarousel />

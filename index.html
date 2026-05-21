@@ -8,6 +8,80 @@
   </head>
   <body>
     <div id="root"></div>
+    <div id="google_translate_element" style="display: none;"></div>
+    <script>
+      (function () {
+        var cookieName = "googtrans";
+        var expire = "expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = cookieName + "=;path=/;" + expire;
+        document.cookie = cookieName + "=;path=/;domain=" + window.location.hostname + ";" + expire;
+        document.cookie = cookieName + "=/en/en;path=/";
+        document.cookie = cookieName + "=/en/en;path=/;domain=" + window.location.hostname;
+      })();
+    </script>
+    <script>
+      window.googleTranslateElementInit = function () {
+        if (!window.google || !window.google.translate) {
+          return;
+        }
+
+        new window.google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            includedLanguages: "en,hi",
+            autoDisplay: false,
+          },
+          "google_translate_element"
+        );
+      };
+    </script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script>
+      (function () {
+        function removeTranslateUI() {
+          var selectors = [
+            "iframe.goog-te-banner-frame",
+            "div.goog-te-banner-frame",
+            "#goog-gt-tt",
+            ".goog-tooltip",
+            ".goog-tooltip-hover",
+            ".goog-te-balloon-frame",
+          ];
+
+          selectors.forEach(function (selector) {
+            document.querySelectorAll(selector).forEach(function (node) {
+              if (node && node.parentNode) {
+                node.parentNode.removeChild(node);
+              }
+            });
+          });
+
+          document.body.style.top = "0px";
+          document.documentElement.style.top = "0px";
+        }
+
+        var attempts = 0;
+        var interval = window.setInterval(function () {
+          attempts += 1;
+          removeTranslateUI();
+
+          if (attempts > 30) {
+            window.clearInterval(interval);
+          }
+        }, 300);
+
+        var observer = new MutationObserver(function () {
+          removeTranslateUI();
+        });
+
+        observer.observe(document.documentElement, {
+          childList: true,
+          subtree: true,
+        });
+
+        window.addEventListener("load", removeTranslateUI);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,5 +1,5 @@
 // src/components/LatestBlogsSection.tsx
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { Eye, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface BlogPost {
@@ -83,6 +83,9 @@ const gold = {
   eyebrow: "text-yellow-500",
 };
 
+const SLIDE_DURATION = 650;
+const SLIDE_EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
+
 // ─── Blog Card ────────────────────────────────────────────────────────────────
 function BlogCard({ title, href, image, author, date, views }: BlogPost) {
   return (
@@ -107,7 +110,7 @@ function BlogCard({ title, href, image, author, date, views }: BlogPost) {
         </div>
 
         {/* Title */}
-        <h3 className={`text-sm font-semibold text-gray-800 leading-snug line-clamp-2 group-hover:${gold.text} transition-colors duration-200`}>
+        <h3 className={`min-h-[2.75rem] text-sm font-semibold text-gray-800 leading-snug line-clamp-2 group-hover:${gold.text} transition-colors duration-200`}>
           {title}
         </h3>
 
@@ -116,7 +119,7 @@ function BlogCard({ title, href, image, author, date, views }: BlogPost) {
           <span className={`font-semibold ${gold.textMid} truncate max-w-[55%]`}>
             {author}
           </span>
-          <span>{date}</span>
+          <span className="whitespace-nowrap">{date}</span>
         </div>
       </div>
     </a>
@@ -178,7 +181,13 @@ function MobileBlogCarousel() {
   const onTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
     const delta = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 40) delta > 0 ? next() : prev();
+    if (Math.abs(delta) > 40) {
+      if (delta > 0) {
+        next();
+      } else {
+        prev();
+      }
+    }
     touchStartX.current = null;
   };
 
@@ -193,7 +202,9 @@ function MobileBlogCarousel() {
           className="flex will-change-transform"
           style={{
             transform: `translateX(-${index * 100}%)`,
-            transition: animated ? "transform 500ms ease-in-out" : "none",
+            transition: animated
+              ? `transform ${SLIDE_DURATION}ms ${SLIDE_EASE}`
+              : "none",
           }}
           onTransitionEnd={onTransitionEnd}
         >
@@ -238,35 +249,64 @@ const STEP = CARD_W + CARD_GAP; // scroll per arrow click
 
 function DesktopBlogCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
+  const singleWidthRef = useRef(0);
+  const stepRef = useRef(STEP);
+  const rafRef = useRef<number | null>(null);
 
   // Initialise scroll to start of the middle copy
   const initScroll = useCallback((el: HTMLDivElement | null) => {
     if (!el) return;
     (trackRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
-    // middle copy starts at index blogs.length
-    el.scrollLeft = blogs.length * STEP;
+    requestAnimationFrame(() => {
+      const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || "0");
+      const firstCard = el.firstElementChild as HTMLElement | null;
+      if (firstCard) {
+        stepRef.current = firstCard.getBoundingClientRect().width + gap;
+      }
+      singleWidthRef.current = el.scrollWidth / 3;
+      el.scrollLeft = singleWidthRef.current;
+    });
   }, []);
 
   const handleScroll = useCallback(() => {
     const el = trackRef.current;
     if (!el) return;
-    const singleWidth = blogs.length * STEP;
-    // If scrolled past 2nd copy → teleport back to 1st copy
-    if (el.scrollLeft >= singleWidth * 2) {
-      el.scrollLeft -= singleWidth;
-    }
-    // If scrolled before 1st copy → teleport forward to 2nd copy
-    if (el.scrollLeft < singleWidth) {
-      el.scrollLeft += singleWidth;
-    }
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      const singleWidth = singleWidthRef.current;
+      if (!singleWidth) return;
+      if (el.scrollLeft < singleWidth) {
+        el.scrollLeft += singleWidth;
+      } else if (el.scrollLeft >= singleWidth * 2) {
+        el.scrollLeft -= singleWidth;
+      }
+    });
   }, []);
 
   const scroll = (dir: "left" | "right") => {
     trackRef.current?.scrollBy({
-      left: dir === "right" ? STEP : -STEP,
+      left: dir === "right" ? stepRef.current : -stepRef.current,
       behavior: "smooth",
     });
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      const el = trackRef.current;
+      if (!el) return;
+      const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || "0");
+      const firstCard = el.firstElementChild as HTMLElement | null;
+      if (firstCard) {
+        stepRef.current = firstCard.getBoundingClientRect().width + gap;
+      }
+      singleWidthRef.current = el.scrollWidth / 3;
+      el.scrollLeft = singleWidthRef.current;
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div className="hidden md:block max-w-6xl mx-auto relative px-10">
@@ -286,7 +326,7 @@ function DesktopBlogCarousel() {
         ref={initScroll}
         onScroll={handleScroll}
         className="
-          flex gap-5 overflow-x-auto scroll-smooth
+          flex gap-5 overflow-x-auto
           [&::-webkit-scrollbar]:hidden
           [scrollbar-width:none]
           [-ms-overflow-style:none]
@@ -321,10 +361,10 @@ export default function LatestBlogsSection() {
         <p className={`text-xs font-semibold tracking-[0.2em] uppercase ${gold.eyebrow} mb-2`}>
           Our Blog
         </p>
-        <h2 className={`text-2xl sm:text-3xl md:text-4xl font-bold ${gold.text} tracking-wide`}>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#b8860b]">
           Latest From Blog
         </h2>
-        <div className={`mx-auto mt-3 h-[2px] w-16 bg-gradient-to-r ${gold.divider} rounded-full`} />
+        <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
         <p className="mt-3 text-sm text-gray-400">
           Top Astrologers &nbsp;·&nbsp; 24×7 Customer Support &nbsp;·&nbsp; Happy to Help
         </p>

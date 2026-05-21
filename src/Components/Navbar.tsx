@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ExternalLink, Globe, UserRound, Menu, X } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 type MenuKey = "calculators" | "horoscopes" | "language" | "blogs" | null;
 
@@ -51,12 +52,12 @@ const horoscopeItems: LinkItem[] = [
 const navLinkClass = (active = false) =>
     [
         "group relative inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-slate-700 transition-all duration-200 ease-out hover:text-amber-700 hover:bg-amber-50/60 whitespace-nowrap",
-        "after:absolute after:bottom-0.5 after:left-3 after:right-3 after:h-px after:origin-left after:scale-x-0 after:bg-gradient-to-r after:from-amber-500 after:to-orange-300 after:transition-transform after:duration-300 group-hover:after:scale-x-100",
+        "after:absolute after:bottom-0.5 after:left-3 after:right-3 after:h-[2px] after:origin-left after:scale-x-0 after:opacity-0 after:rounded-full after:bg-gradient-to-r after:from-amber-500 after:to-orange-300 after:transition-[transform,opacity] after:duration-300 group-hover:after:scale-x-100 group-hover:after:opacity-100",
         active ? "text-amber-700 bg-amber-50/60 after:scale-x-100" : "",
     ].join(" ");
 
 const panelBaseClass =
-    "absolute top-full mt-2 origin-top rounded-2xl border border-amber-200/80 bg-white/98 text-slate-800 shadow-[0_20px_60px_rgba(138,101,11,0.15),0_4px_16px_rgba(0,0,0,0.06)] backdrop-blur-2xl transition-all duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] z-[9999]";
+    "absolute top-full mt-2 origin-top rounded-2xl border border-amber-200/80 bg-amber-50 text-slate-800 shadow-[0_20px_60px_rgba(138,101,11,0.15),0_4px_16px_rgba(0,0,0,0.06)] backdrop-blur-2xl transition-all duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] z-[9999]";
 
 const scrollbarStyles = `
   .vedas-scroll::-webkit-scrollbar {
@@ -126,8 +127,15 @@ function Navbar() {
     const [activeItem, setActiveItem] = useState("");
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const { language, setLanguage } = useLanguage();
     const navRef = useRef<HTMLElement>(null);
     const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const languageLabel = language === "hi" ? "हिंदी" : "English";
+    const languageOptions = [
+        { code: "en", label: "English" },
+        { code: "hi", label: "हिंदी" },
+    ];
 
     useEffect(() => {
         document.body.style.overflow = isMobileOpen ? "hidden" : "";
@@ -198,13 +206,9 @@ function Navbar() {
                 className={[
                     "sticky top-0 z-[100] w-full text-slate-900 transition-all duration-300",
                     isScrolled
-                        ? "bg-[#fffdf8]/95 shadow-[0_8px_32px_rgba(138,101,11,0.10)] backdrop-blur-2xl"
-                        : "bg-[#fffdf8]/90 backdrop-blur-xl",
+                        ? "bg-white shadow-[0_8px_32px_rgba(138,101,11,0.10)]"
+                        : "bg-white",
                 ].join(" ")}
-                style={{
-                    backgroundImage:
-                        "radial-gradient(ellipse at top left, rgba(245,208,120,0.22), transparent 40%), linear-gradient(180deg, rgba(255,253,248,0.98), rgba(250,244,232,0.96))",
-                }}
             >
                 {/* Top shimmer line */}
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
@@ -228,13 +232,13 @@ function Navbar() {
                         </a>
 
                         {/* Row 1 centre: plain (non-dropdown) links */}
-                        <nav className="flex items-center gap-0.5 flex-1 justify-center">
+                        <nav className="flex flex-wrap items-center justify-center gap-x-0.5 gap-y-1 flex-1">
                             <button type="button" className={navLinkClass(activeItem === "free-kundli")} onClick={() => { setActiveItem("free-kundli"); setOpenMenu(null); }}>Free Kundli</button>
                             <button type="button" className={navLinkClass(activeItem === "kundli-matching")} onClick={() => { setActiveItem("kundli-matching"); setOpenMenu(null); }}>Kundli Matching</button>
                             <button type="button" className={navLinkClass(activeItem === "compatibility")} onClick={() => { setActiveItem("compatibility"); setOpenMenu(null); }}>Compatibility</button>
-                            <button type="button" className={navLinkClass(activeItem === "chat-with-astrologer")} onClick={() => { setActiveItem("chat-with-astrologer"); setOpenMenu(null); }}>Chat with Astrologer</button>
+                            <button type="button" className={navLinkClass(activeItem === "courses")} onClick={() => { setActiveItem("courses"); setOpenMenu(null); }}>Courses</button>
+                            <button type="button" className={navLinkClass(activeItem === "tools")} onClick={() => { setActiveItem("tools"); setOpenMenu(null); }}>Tools</button>
                             <button type="button" className={navLinkClass(activeItem === "talk-to-astrologer")} onClick={() => { setActiveItem("talk-to-astrologer"); setOpenMenu(null); }}>Talk to Astrologer</button>
-                            <button type="button" className={navLinkClass(activeItem === "VedasMall")} onClick={() => { setActiveItem("VedasMall"); setOpenMenu(null); }}>VedasMall</button>
                             <a
                                 href="https://vedastraa.com/store"
                                 className={navLinkClass(activeItem === "vedastraa-store")}
@@ -254,15 +258,26 @@ function Navbar() {
                                     className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-white/80 px-3.5 py-2 text-sm font-medium text-slate-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700"
                                     aria-expanded={openMenu === "language"}
                                     onClick={() => toggleMenu("language")}
+                                    translate="no"
                                 >
                                     <Globe className="h-4 w-4 text-amber-500" />
-                                    Eng
+                                    <span className="notranslate" translate="no">{languageLabel}</span>
                                     <ChevronDown className={["h-3.5 w-3.5 text-amber-500 transition-transform duration-300", openMenu === "language" ? "rotate-180" : ""].join(" ")} />
                                 </button>
                                 <div className={[panelBaseClass, "right-0 left-auto w-36 p-1.5", openMenu === "language" ? "pointer-events-auto translate-y-0 opacity-100 scale-y-100" : "pointer-events-none -translate-y-1 opacity-0 scale-y-95"].join(" ")}>
-                                    {[{ label: "हिंदी" }, { label: "ಕನ್ನಡ" }].map((item) => (
-                                        <button key={item.label} type="button" className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-slate-700 transition-colors hover:bg-amber-50 hover:text-amber-900" onClick={() => { setActiveItem(item.label); setOpenMenu(null); }}>
-                                            {item.label}
+                                    {languageOptions.map((item) => (
+                                        <button
+                                            key={item.code}
+                                            type="button"
+                                            className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-slate-700 transition-colors hover:bg-amber-50 hover:text-amber-900 notranslate"
+                                            translate="no"
+                                            onClick={() => {
+                                                setLanguage(item.code);
+                                                setActiveItem(item.label);
+                                                setOpenMenu(null);
+                                            }}
+                                        >
+                                            <span className="notranslate" translate="no">{item.label}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -279,7 +294,7 @@ function Navbar() {
                     </div>
 
                     {/* ══ ROW 2: Dropdown links only ══ */}
-                    <div className="hidden lg:flex items-center gap-1 py-2">
+                    <div className="hidden lg:flex flex-wrap items-center gap-x-1 gap-y-1 py-2">
 
                         {/* Calculators */}
                         <div className="relative" onMouseEnter={() => openMenuDelayed("calculators")} onMouseLeave={() => closeMenuDelayed("calculators")}>
@@ -332,6 +347,10 @@ function Navbar() {
                             </div>
                         </div>
 
+                        <button type="button" className={navLinkClass(activeItem === "gemstones")} onClick={() => { setActiveItem("gemstones"); setOpenMenu(null); }}>Gemstones</button>
+                        <button type="button" className={navLinkClass(activeItem === "rudraksh")} onClick={() => { setActiveItem("rudraksh"); setOpenMenu(null); }}>Rudraksh</button>
+                        <button type="button" className={navLinkClass(activeItem === "bracelets")} onClick={() => { setActiveItem("bracelets"); setOpenMenu(null); }}>Bracelets</button>
+
                         {/* Tagline */}
                         <div className="ml-auto flex items-center gap-2 text-xs text-amber-600/60 italic tracking-wide select-none">
                             <span className="hidden xl:inline">Astrology • Guidance • Destiny</span>
@@ -342,13 +361,13 @@ function Navbar() {
                     <div className="flex lg:hidden items-center justify-between py-3">
                         <a
                             href="#"
-                            className="relative flex h-[60px] min-w-[90px] items-center overflow-visible transition-opacity duration-300 hover:opacity-75"
+                            className="relative flex h-[60px] min-w-[130px] items-center overflow-visible transition-opacity duration-300 hover:opacity-75"
                             onClick={(e) => { e.preventDefault(); setActiveItem("vedastraa-brand"); }}
                         >
                             <img
                                 src="/logo-removebg.png"
                                 alt="Vedastraa Logo"
-                                className="absolute left-0 top-1/2 z-10 h-[90px] w-auto -translate-y-1/2 object-contain"
+                                className="absolute left-0 top-1/2 z-10 h-[110px] w-auto -translate-y-1/2 object-contain"
                             />
                         </a>
 
@@ -382,10 +401,9 @@ function Navbar() {
 
             <div
                 className={[
-                    "fixed top-0 right-0 z-[300] h-full w-[85vw] max-w-[340px] shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden overflow-y-auto",
-                    isMobileOpen ? "translate-x-0" : "translate-x-full",
+                    "fixed top-0 left-0 z-[300] h-full w-[78vw] max-w-[300px] shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden overflow-y-auto bg-white",
+                    isMobileOpen ? "translate-x-0" : "-translate-x-full",
                 ].join(" ")}
-                style={{ background: "linear-gradient(160deg, #fffdf8 0%, #fdf6e8 100%)" }}
             >
                 <div className="flex items-center justify-between border-b border-amber-200/60 px-5 py-4">
                     <span className="text-sm font-bold tracking-[0.2em] uppercase text-amber-600">Menu</span>
@@ -399,9 +417,12 @@ function Navbar() {
                         { label: "Free Kundli", key: "free-kundli" },
                         { label: "Kundli Matching", key: "kundli-matching" },
                         { label: "Compatibility", key: "compatibility" },
-                        { label: "Chat with Astrologer", key: "chat-with-astrologer" },
+                        { label: "Courses", key: "courses" },
+                        { label: "Tools", key: "tools" },
+                        { label: "Gemstones", key: "gemstones" },
+                        { label: "Rudraksh", key: "rudraksh" },
+                        { label: "Bracelets", key: "bracelets" },
                         { label: "Talk to Astrologer", key: "talk-to-astrologer" },
-                        { label: "VedasMall", key: "VedasMall" },
                     ].map((item) => (
                         <button
                             key={item.key}
@@ -432,11 +453,16 @@ function Navbar() {
                     </div>
                 </MobileAccordion>
 
-                <div className="p-4 space-y-3 border-t border-amber-100/60 mt-2">
+                <div className="p-4 space-y-3 mt-2">
                     <div className="rounded-xl border border-amber-100 bg-white overflow-hidden">
                         <div className="px-4 py-2 text-[0.6rem] uppercase tracking-widest text-amber-600 font-semibold border-b border-amber-100">Language</div>
-                        {[{ label: "English" }, { label: "हिंदी" }, { label: "ಕನ್ನಡ" }].map((item) => (
-                            <button key={item.label} type="button" className="flex w-full items-center gap-2 px-4 py-3 text-sm text-slate-700 hover:bg-amber-50 border-b border-amber-100/60 last:border-0" onClick={() => { setActiveItem(item.label); closeMobile(); }}>
+                        {languageOptions.map((item) => (
+                            <button
+                                key={item.code}
+                                type="button"
+                                className="flex w-full items-center gap-2 px-4 py-3 text-sm text-slate-700 hover:bg-amber-50 border-b border-amber-100/60 last:border-0"
+                                onClick={() => { setLanguage(item.code); setActiveItem(item.label); closeMobile(); }}
+                            >
                                 <Globe className="h-4 w-4 text-amber-500" /> {item.label}
                             </button>
                         ))}

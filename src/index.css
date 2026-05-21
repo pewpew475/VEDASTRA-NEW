@@ -5,10 +5,34 @@
 @layer base {
 	html {
 		scroll-behavior: smooth;
+		top: 0 !important;
 	}
 
 	body {
 		@apply bg-[#050816] text-slate-100 antialiased;
+		top: 0 !important;
+	}
+
+	iframe.skiptranslate,
+	.goog-te-banner-frame.skiptranslate,
+	.goog-te-banner-frame {
+		display: none !important;
+	}
+
+	.goog-logo-link,
+	.goog-te-gadget span,
+	.goog-tooltip,
+	.goog-text-highlight,
+	.goog-te-balloon-frame,
+	#goog-gt-tt,
+	#goog-gt-vt {
+		display: none !important;
+	}
+
+	.goog-te-gadget,
+	#google_translate_element {
+		display: none !important;
+		font-size: 0 !important;
 	}
 
 	::selection {

@@ -1,5 +1,5 @@
 // src/components/OurAstrologersSection.tsx
-import { useRef, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 
 interface Astrologer {
@@ -85,7 +85,16 @@ const GOLD_BORDER = "#fde68a";
 const DESKTOP_CARD_W = 160;
 const DESKTOP_GAP    = 20;
 const DESKTOP_STEP   = DESKTOP_CARD_W + DESKTOP_GAP;
-const MOBILE_GAP_PX  = 12;
+const SLIDE_DURATION = 650;
+const SLIDE_EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
+
+const MOBILE_VISIBLE = 2;
+const MOBILE_CLONES = 2;
+const MOBILE_ITEMS = [
+  ...astrologers.slice(-MOBILE_CLONES),
+  ...astrologers,
+  ...astrologers.slice(0, MOBILE_CLONES),
+];
 
 // ─── Astrologer Card ──────────────────────────────────────────────────────────
 function AstrologerCard({ name, skill, href, image, rating, experience }: Astrologer) {
@@ -136,56 +145,69 @@ function AstrologerCard({ name, skill, href, image, rating, experience }: Astrol
 // scrollLeft near 0 during deceleration, triggering a false teleport.
 // ─────────────────────────────────────────────────────────────────────────────
 function MobileCarousel() {
-  const trackRef      = useRef<HTMLDivElement | null>(null);
-  const singleWidth   = useRef<number>(0);
-  const debounceRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [index, setIndex] = useState(MOBILE_CLONES);
+  const [animated, setAnimated] = useState(true);
+  const touchStartX = useRef<number | null>(null);
+  const isTransitioning = useRef(false);
 
-  const initScroll = useCallback((el: HTMLDivElement | null) => {
-    if (!el) return;
-    trackRef.current = el;
-    requestAnimationFrame(() => {
-      const firstCard = el.firstElementChild as HTMLElement | null;
-      if (!firstCard) return;
-      const cardW = firstCard.offsetWidth;
-      singleWidth.current = astrologers.length * (cardW + MOBILE_GAP_PX);
-      el.scrollLeft = singleWidth.current; // start at middle copy
-    });
+  const goTo = useCallback((next: number, withAnim = true) => {
+    if (isTransitioning.current) return;
+    isTransitioning.current = true;
+    setAnimated(withAnim);
+    setIndex(next);
   }, []);
 
-  const handleScroll = useCallback(() => {
-    const el = trackRef.current;
-    if (!el || singleWidth.current === 0) return;
+  const onTransitionEnd = useCallback(() => {
+    isTransitioning.current = false;
+    if (index <= MOBILE_CLONES - 1) {
+      setAnimated(false);
+      setIndex(index + astrologers.length);
+    } else if (index >= astrologers.length + MOBILE_CLONES) {
+      setAnimated(false);
+      setIndex(index - astrologers.length);
+    }
+    requestAnimationFrame(() => requestAnimationFrame(() => setAnimated(true)));
+  }, [index]);
 
-    // Debounce: only teleport after scroll momentum fully stops
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      const sw = singleWidth.current;
-      if (el.scrollLeft >= sw * 2) el.scrollLeft -= sw;
-      else if (el.scrollLeft < sw) el.scrollLeft += sw;
-    }, 150);
-  }, []);
+  const prev = () => goTo(index - 1);
+  const next = () => goTo(index + 1);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const delta = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(delta) > 40) {
+      if (delta > 0) {
+        next();
+      } else {
+        prev();
+      }
+    }
+    touchStartX.current = null;
+  };
 
   return (
-    <div className="md:hidden">
-      <div
-        ref={initScroll}
-        onScroll={handleScroll}
-        className="
-          flex gap-3 overflow-x-auto pl-4
-          [&::-webkit-scrollbar]:hidden
-          [scrollbar-width:none]
-          [-ms-overflow-style:none]
-        "
-      >
-        {[...astrologers, ...astrologers, ...astrologers].map((a, i) => (
-          <div
-            key={`${a.href}-${i}`}
-            className="flex-shrink-0"
-            style={{ width: "44vw" }}
-          >
-            <AstrologerCard {...a} />
-          </div>
-        ))}
+    <div className="md:hidden px-4">
+      <div className="overflow-hidden" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <div
+          className="flex will-change-transform"
+          style={{
+            transform: `translateX(-${index * (100 / MOBILE_VISIBLE)}%)`,
+            transition: animated
+              ? `transform ${SLIDE_DURATION}ms ${SLIDE_EASE}`
+              : "none",
+          }}
+          onTransitionEnd={onTransitionEnd}
+        >
+          {MOBILE_ITEMS.map((a, i) => (
+            <div key={`${a.href}-${i}`} className="flex-none w-1/2 px-2">
+              <AstrologerCard {...a} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -200,33 +222,63 @@ function MobileCarousel() {
 // ─────────────────────────────────────────────────────────────────────────────
 function DesktopCarousel() {
   const trackRef    = useRef<HTMLDivElement | null>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const singleWidthRef = useRef(0);
+  const stepRef = useRef(DESKTOP_STEP);
+  const rafRef = useRef<number | null>(null);
 
   const initScroll = useCallback((el: HTMLDivElement | null) => {
     if (!el) return;
     trackRef.current = el;
     requestAnimationFrame(() => {
-      el.scrollLeft = astrologers.length * DESKTOP_STEP;
+      const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || "0");
+      const firstCard = el.firstElementChild as HTMLElement | null;
+      if (firstCard) {
+        stepRef.current = firstCard.getBoundingClientRect().width + gap;
+      }
+      singleWidthRef.current = el.scrollWidth / 3;
+      el.scrollLeft = singleWidthRef.current;
     });
   }, []);
 
   const handleScroll = useCallback(() => {
     const el = trackRef.current;
     if (!el) return;
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      const sw = astrologers.length * DESKTOP_STEP;
-      if (el.scrollLeft >= sw * 2) el.scrollLeft -= sw;
-      else if (el.scrollLeft < sw) el.scrollLeft += sw;
-    }, 100);
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      const sw = singleWidthRef.current;
+      if (!sw) return;
+      if (el.scrollLeft >= sw * 2) {
+        el.scrollLeft -= sw;
+      } else if (el.scrollLeft < sw) {
+        el.scrollLeft += sw;
+      }
+    });
   }, []);
 
   const scroll = (dir: "left" | "right") => {
     trackRef.current?.scrollBy({
-      left: dir === "right" ? DESKTOP_STEP : -DESKTOP_STEP,
+      left: dir === "right" ? stepRef.current : -stepRef.current,
       behavior: "smooth",
     });
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      const el = trackRef.current;
+      if (!el) return;
+      const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || "0");
+      const firstCard = el.firstElementChild as HTMLElement | null;
+      if (firstCard) {
+        stepRef.current = firstCard.getBoundingClientRect().width + gap;
+      }
+      singleWidthRef.current = el.scrollWidth / 3;
+      el.scrollLeft = singleWidthRef.current;
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div className="hidden md:block max-w-6xl mx-auto relative px-10">
@@ -275,7 +327,7 @@ function DesktopCarousel() {
 // ─── Section ──────────────────────────────────────────────────────────────────
 export default function OurAstrologersSection() {
   return (
-    <section className="bg-white py-10 md:py-16">
+    <section className="bg-white pt-10 pb-0 md:py-16">
       <div className="max-w-6xl mx-auto text-center mb-8 md:mb-10 px-4">
         <p
           className="text-xs font-semibold tracking-[0.2em] uppercase mb-2"
@@ -283,16 +335,10 @@ export default function OurAstrologersSection() {
         >
           Meet The Experts
         </p>
-        <h2
-          className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-wide"
-          style={{ color: GOLD }}
-        >
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#b8860b]">
           Our Astrologers
         </h2>
-        <div
-          className="mx-auto mt-3 h-[2px] w-16 rounded-xl"
-          style={{ background: `linear-gradient(to right, #d4a017, ${GOLD})` }}
-        />
+        <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
         <p className="mt-3 text-sm text-gray-400">
           Best Astrologers from India for Online Consultation
         </p>

@@ -112,7 +112,7 @@ const accordionItems: AccordionItem[] = [
               className="mt-1.5 flex-shrink-0 w-2 h-2 rounded-full"
               style={{ background: GOLD }}
             />
-            <span>{tip}</span>
+            {tip}
           </li>
         ))}
       </ul>
@@ -133,9 +133,10 @@ const accordionItems: AccordionItem[] = [
 
 export default function SeoContentSection() {
   return (
-    <section className="bg-white py-14 md:py-20 px-4">
+    // ✅ FIX: pb-0 on mobile removes bottom padding that was exposing a thin line
+    // below this section. Desktop keeps py-20 as normal.
+    <section className="bg-white pt-14 pb-10 md:py-20 px-4">
       <div className="max-w-4xl mx-auto">
-
         {/* Main Heading */}
         <div className="text-center mb-10 md:mb-14">
           <p
@@ -144,25 +145,10 @@ export default function SeoContentSection() {
           >
             Ancient Wisdom · Modern Guidance
           </p>
-          <h2
-            className="text-2xl md:text-4xl font-bold leading-tight"
-            style={{ color: "#1a1a1a" }}
-          >
-            Why{" "}
-            <span
-              style={{
-                background: `linear-gradient(90deg, ${GOLD}, #e8c44a)`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              Astrology?
-            </span>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#b8860b]">
+            Why Astrology?
           </h2>
-          <div
-            className="mx-auto mt-3 h-0.5 w-16 rounded-full"
-            style={{ background: `linear-gradient(90deg, ${GOLD}, #e8c44a)` }}
-          />
+          <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
         </div>
 
         {/* Intro Card */}
@@ -171,14 +157,18 @@ export default function SeoContentSection() {
           style={{ background: GOLD_LIGHT, borderColor: GOLD_BORDER }}
         >
           <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-3">
-            Have you ever felt that things in life sometimes happen at just the right time, like someone is silently guiding you?{" "}
-            <strong style={{ color: GOLD }}>Astrology helps us understand this.</strong> It shows how divine energy flows through planets and stars, shaping our daily lives.
+            Have you ever felt that things in life sometimes happen at just the right time, like someone is silently
+            guiding you?{" "}
+            <strong style={{ color: GOLD }}>Astrology helps us understand this.</strong> It shows how divine energy
+            flows through planets and stars, shaping our daily lives.
           </p>
           <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-3">
-            This old and trusted knowledge explains that nothing is random — everything has a reason. The stars often hold clues about our purpose and future.
+            This old and trusted knowledge explains that nothing is random — everything has a reason. The stars often
+            hold clues about our purpose and future.
           </p>
           <p className="text-gray-700 text-sm md:text-base leading-relaxed">
-            By learning to read signs from the universe, we can walk in tune with the cosmic plan. For years, astrology has helped people make better decisions in love, work, family, and their spiritual journey.
+            By learning to read signs from the universe, we can walk in tune with the cosmic plan. For years, astrology
+            has helped people make better decisions in love, work, family, and their spiritual journey.
           </p>
         </div>
 
@@ -186,8 +176,10 @@ export default function SeoContentSection() {
         <Accordion items={accordionItems} />
 
         {/* Conclusion CTA */}
+        {/* ✅ FIX: Removed "border-0 md:border" — replaced with just "md:border"  */}
+        {/* On mobile, no border means no visible edge/line bleeding into next section */}
         <div
-          className="mt-10 md:mt-14 rounded-2xl p-6 md:p-8 text-center border"
+          className="mt-10 md:mt-14 rounded-2xl p-6 md:p-8 text-center md:border"
           style={{
             background: `linear-gradient(135deg, #fffbeb, ${GOLD_LIGHT})`,
             borderColor: GOLD_BORDER,
@@ -207,22 +199,24 @@ export default function SeoContentSection() {
             Today
           </h3>
           <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-2xl mx-auto mb-3">
-            Astrology helps us understand the divine plan by showing how cosmic energy flows through our lives. This ancient knowledge brings comfort in tough times and guides better choices in love, work, family, and spiritual growth.
+            Astrology helps us understand the divine plan by showing how cosmic energy flows through our lives. This
+            ancient knowledge brings comfort in tough times and guides better choices in love, work, family, and
+            spiritual growth.
           </p>
           <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
-            Astrology doesn't take away your power — it helps you make wise decisions by understanding the stars and combining faith with action.
+            Astrology doesn't take away your power — it helps you make wise decisions by understanding the stars and
+            combining faith with action.
           </p>
           <button
             className="mt-6 px-7 py-3 rounded-full font-semibold text-white text-sm md:text-base shadow-md transition-all duration-200 active:scale-95"
             style={{
               background: `linear-gradient(135deg, #e8c44a, ${GOLD})`,
-              boxShadow: `0 4px 18px rgba(184,134,11,0.35)`,
+              boxShadow: "0 4px 18px rgba(184,134,11,0.35)",
             }}
           >
             Consult an Astrologer
           </button>
         </div>
-
       </div>
     </section>
   );

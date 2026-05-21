@@ -14,37 +14,36 @@ interface FaqItem {
 const faqs: FaqItem[] = [
   {
     question: "Why is Astrology so accurate?",
-    answer:
-      "Astrology's accuracy comes from thousands of years of careful observation linking planetary movements to human experiences. Experienced astrologers study birth charts that map cosmic influences at your exact birth moment, providing personalized insights rather than generic predictions for everyone.",
+    answer: "Astrology's accuracy comes from thousands of years of careful observation linking planetary movements to human experiences. Experienced astrologers study birth charts that map cosmic influences at your exact birth moment, providing personalized insights rather than generic predictions for everyone.",
   },
   {
     question: "Why should you choose Vedastraa for astrology guidance?",
-    answer:
-      "Vedastraa connects you with verified, experienced astrologers who provide personalized guidance based on your unique birth details and life circumstances. The platform offers various consultation formats, transparent pricing, and convenient scheduling that make divine wisdom accessible whenever you need spiritual support.",
+    answer: "Vedastraa connects you with verified, experienced astrologers who provide personalized guidance based on your unique birth details and life circumstances. The platform offers various consultation formats, transparent pricing, and convenient scheduling that make divine wisdom accessible whenever you need spiritual support.",
   },
   {
     question: "Is astrology prediction true?",
-    answer:
-      "Astrology predictions reflect cosmic influences and potential outcomes based on planetary patterns, but your free will and actions ultimately determine your life path. Accurate predictions come from skilled astrologers who understand how cosmic energies interact with individual birth charts and life circumstances.",
+    answer: "Astrology predictions reflect cosmic influences and potential outcomes based on planetary patterns, but your free will and actions ultimately determine your life path. Accurate predictions come from skilled astrologers who understand how cosmic energies interact with individual birth charts and life circumstances.",
   },
   {
     question: "How can online astrology help me predict the future?",
-    answer:
-      "Online astrology analyzes your birth chart and current planetary transits to identify upcoming opportunities, challenges, and favorable timing for important decisions. This cosmic guidance helps you prepare for future events and make choices aligned with universal energy flows.",
+    answer: "Online astrology analyzes your birth chart and current planetary transits to identify upcoming opportunities, challenges, and favorable timing for important decisions. This cosmic guidance helps you prepare for future events and make choices aligned with universal energy flows.",
   },
   {
     question: "How reliable is Vedastraa?",
-    answer:
-      "Vedastraa maintains high reliability through verified astrologer credentials, secure payment systems, and consistent customer support. User reviews and ratings help ensure quality consultations, while the platform's reputation is built on genuine spiritual guidance that helps people improve their lives.",
+    answer: "Vedastraa maintains high reliability through verified astrologer credentials, secure payment systems, and consistent customer support. User reviews and ratings help ensure quality consultations, while the platform's reputation is built on genuine spiritual guidance that helps people improve their lives.",
   },
   {
     question: "How much does a consultation on Vedastraa cost?",
-    answer:
-      "Vedastraa offers various pricing options from free introductory sessions to premium consultations, with costs typically varying based on astrologer experience and session length. Many users start with a free 5-minute session before investing in longer, more detailed guidance with their preferred practitioner.",
+    answer: "Vedastraa offers various pricing options from free introductory sessions to premium consultations, with costs typically varying based on astrologer experience and session length. Many users start with a free 5-minute session before investing in longer, more detailed guidance with their preferred practitioner.",
   },
 ];
 
-function FaqCard({ item, index, isOpen, onToggle }: {
+function FaqCard({
+  item,
+  index,
+  isOpen,
+  onToggle,
+}: {
   item: FaqItem;
   index: number;
   isOpen: boolean;
@@ -55,7 +54,7 @@ function FaqCard({ item, index, isOpen, onToggle }: {
       className="rounded-2xl border overflow-hidden transition-all duration-300"
       style={{
         borderColor: isOpen ? GOLD_BORDER : "#e5e7eb",
-        boxShadow: isOpen ? `0 4px 20px rgba(184,134,11,0.12)` : "none",
+        boxShadow: isOpen ? "0 4px 20px rgba(184,134,11,0.12)" : "none",
       }}
     >
       <button
@@ -70,7 +69,6 @@ function FaqCard({ item, index, isOpen, onToggle }: {
         >
           {String(index + 1).padStart(2, "0")}
         </span>
-
         {/* Question text */}
         <span
           className="flex-1 font-semibold text-sm md:text-base leading-snug"
@@ -78,7 +76,6 @@ function FaqCard({ item, index, isOpen, onToggle }: {
         >
           {item.question}
         </span>
-
         {/* Toggle icon */}
         <span className="flex-shrink-0 mt-0.5">
           {isOpen ? (
@@ -88,14 +85,12 @@ function FaqCard({ item, index, isOpen, onToggle }: {
           )}
         </span>
       </button>
-
       {/* Answer panel */}
       {isOpen && (
         <div
           className="px-5 pb-5 pt-1 md:px-6 md:pb-6 text-sm md:text-base text-gray-600 leading-relaxed"
           style={{ background: GOLD_LIGHT, borderTop: `1px solid ${GOLD_BORDER}` }}
         >
-          {/* indent to align with question text */}
           <div className="ml-11">{item.answer}</div>
         </div>
       )}
@@ -109,36 +104,19 @@ export default function FaqSection() {
   const toggle = (i: number) => setOpenIndex(openIndex === i ? null : i);
 
   return (
-    <section className="bg-white py-14 md:py-20 px-4">
+    // ✅ FIX: Restored symmetric py-14 md:py-20 — no more pt-8 hack needed
+    // because Seo-section-6 is now fixed at the source (pb-0 on mobile).
+    <section className="bg-white py-14 md:py-20 px-4 -mb-px">
       <div className="max-w-3xl mx-auto">
-
         {/* Section header */}
         <div className="text-center mb-10 md:mb-14">
-          <p
-            className="uppercase tracking-widest text-xs md:text-sm font-semibold mb-3"
-            style={{ color: GOLD }}
-          >
+          <p className="uppercase tracking-widest text-xs md:text-sm font-semibold mb-3" style={{ color: GOLD }}>
             Got Questions?
           </p>
-          <h2
-            className="text-2xl md:text-4xl font-bold leading-tight"
-            style={{ color: "#1a1a1a" }}
-          >
-            Frequently Asked{" "}
-            <span
-              style={{
-                background: `linear-gradient(90deg, ${GOLD}, #e8c44a)`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              Questions
-            </span>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#b8860b]">
+            Frequently Asked Questions
           </h2>
-          <div
-            className="mx-auto mt-3 h-0.5 w-16 rounded-full"
-            style={{ background: `linear-gradient(90deg, ${GOLD}, #e8c44a)` }}
-          />
+          <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
         </div>
 
         {/* FAQ list */}
@@ -165,7 +143,6 @@ export default function FaqSection() {
             Talk to an astrologer
           </a>
         </p>
-
       </div>
     </section>
   );
