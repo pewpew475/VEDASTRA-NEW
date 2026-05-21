@@ -145,8 +145,8 @@ export default function SeoContentSection() {
           >
             Ancient Wisdom · Modern Guidance
           </p>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#b8860b]">
-            Why Astrology?
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#111111]">
+            Why <span className="text-[#b8860b]">Astrology?</span>
           </h2>
           <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
         </div>

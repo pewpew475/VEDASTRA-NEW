@@ -230,8 +230,8 @@ export default function HoroscopeStrip() {
 
       {/* Section Heading */}
       <div className="mb-5 flex flex-col items-center text-center">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#b8860b]">
-          Today's Horoscope
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#111111]">
+          Today's <span className="text-[#b8860b]">Horoscope</span>
         </h2>
         <div className="mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600 mx-auto" />
       </div>

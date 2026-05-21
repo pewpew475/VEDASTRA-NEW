@@ -361,8 +361,8 @@ export default function LatestBlogsSection() {
         <p className={`text-xs font-semibold tracking-[0.2em] uppercase ${gold.eyebrow} mb-2`}>
           Our Blog
         </p>
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#b8860b]">
-          Latest From Blog
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#111111]">
+          Latest From <span className="text-[#b8860b]">Blog</span>
         </h2>
         <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
         <p className="mt-3 text-sm text-gray-400">

@@ -113,8 +113,8 @@ export default function FaqSection() {
           <p className="uppercase tracking-widest text-xs md:text-sm font-semibold mb-3" style={{ color: GOLD }}>
             Got Questions?
           </p>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#b8860b]">
-            Frequently Asked Questions
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#111111]">
+            Frequently Asked <span className="text-[#b8860b]">Questions</span>
           </h2>
           <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
         </div>

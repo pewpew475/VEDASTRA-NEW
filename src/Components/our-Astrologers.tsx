@@ -335,8 +335,8 @@ export default function OurAstrologersSection() {
         >
           Meet The Experts
         </p>
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#b8860b]">
-          Our Astrologers
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#111111]">
+          Our <span className="text-[#b8860b]">Astrologers</span>
         </h2>
         <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
         <p className="mt-3 text-sm text-gray-400">

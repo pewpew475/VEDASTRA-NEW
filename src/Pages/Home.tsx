@@ -5,6 +5,7 @@ import Freeservices from "../Components/Freeservices"
 import Latestfromvedastra from "../Components/Latest-from-vedastra"
 import OurAstrologers from "../Components/our-Astrologers"
 import SeoSection from "../Components/Seo-section"
+import Testimonials from "../Components/Testimonials"
 import FAQ from "../Components/FAQ"
 
 type HomeProps = {
@@ -21,6 +22,7 @@ function Home({ bannerInitialDelayMs = 3000 }: HomeProps) {
         <Freeservices />
         <Latestfromvedastra />
         <OurAstrologers/>
+        <Testimonials/>
         <SeoSection/>
         <FAQ/>
 

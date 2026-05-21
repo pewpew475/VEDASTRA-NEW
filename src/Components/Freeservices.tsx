@@ -329,8 +329,8 @@ export default function FreeServicesSection() {
   return (
     <section className="bg-white py-10 md:py-16 pb-10">
       <div className="max-w-6xl mx-auto text-center mb-8 md:mb-10 px-4">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#b8860b]">
-          Try Before You Talk
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#111111]">
+          Try Before You <span className="text-[#b8860b]">Talk</span>
         </h2>
         <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
       </div>
