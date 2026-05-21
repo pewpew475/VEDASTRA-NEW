@@ -7,7 +7,7 @@ import Banner4 from "../assets/Banner-4.webp";
 import Banner5 from "../assets/Banner-5.webp";
 import Banner6 from "../assets/Banner-6.webp";
 import Banner7 from "../assets/Banner-7.webp";
-import PhoneBanner1 from "../assets/Phone-Banner-1.webp";
+import PhoneBanner1 from "../assets/Phone-banner-1.webp";
 import PhoneBanner2 from "../assets/Pnone-banner-2.webp";
 import PhoneBanner3 from "../assets/Phone-banner-3.webp";
 import PhoneBanner4 from "../assets/Phone-banner-4.webp";
