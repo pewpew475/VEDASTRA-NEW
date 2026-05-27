@@ -228,6 +228,7 @@ function Navbar() {
                                 src="/logo-removebg.png"
                                 alt="Vedastraa Logo"
                                 className="absolute left-0 top-1/2 z-10 h-[120px] w-auto -translate-y-1/2 object-contain"
+                                style={{ filter: "drop-shadow(0 6px 14px rgba(120, 80, 20, 0.35)) contrast(1.3) brightness(0.8) saturate(1.3)" }}
                             />
                         </a>
 

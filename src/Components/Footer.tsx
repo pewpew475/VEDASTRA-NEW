@@ -141,7 +141,7 @@ export const Footer = () => {
                 width={448}
                 height={128}
                 className="block h-24 w-auto sm:h-28 lg:h-32"
-                style={{ objectFit: "contain" }}
+                style={{ objectFit: "contain", filter: "drop-shadow(0 6px 14px rgba(120, 80, 20, 0.35)) contrast(1.18) brightness(0.8) saturate(1.05)" }}
                 loading="lazy"
                 decoding="async"
               />
