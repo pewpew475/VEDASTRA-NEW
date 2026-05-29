@@ -1,8 +1,6 @@
 // src/components/FreeServicesSection.tsx
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import {
-  ChevronLeft,
-  ChevronRight,
   Sun,
   ScrollText,
   HeartHandshake,
@@ -64,141 +62,184 @@ const services: Service[] = [
   },
 ];
 
-// ─── Gold tokens ──────────────────────────────────────────────────────────────
-const GOLD = "#b8860b";        // DarkGoldenrod — rich gold
-const GOLD_LIGHT = "#fefce8";  // yellow-50 equivalent
-const GOLD_BORDER = "#fde68a"; // yellow-200 equivalent
+// ─── All styles ───────────────────────────────────────────────────────────────
+const STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
 
-const SLIDE_DURATION = 650;
-const SLIDE_EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
+  /* ── Card base ── */
+  .fs-card {
+    display: flex;
+    flex-direction: column;
+    background: #FFFFFF;
+    border: 1px solid #E8E2D6;
+    border-radius: 18px;
+    padding: 28px 24px 24px;
+    text-decoration: none;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
 
-// ─── Desktop carousel constants ───────────────────────────────────────────────
-const CARD_W = 260;
-const CARD_GAP = 20;
-const STEP = CARD_W + CARD_GAP;
+  /* ── Hover only on real pointer devices (not touch screens) ── */
+  @media (hover: hover) and (pointer: fine) {
+    .fs-card {
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+    .fs-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(160, 120, 48, 0.09);
+      border-color: #C9A84C;
+    }
+    .fs-card:hover .fs-try-now {
+      gap: 10px;
+    }
+  }
+
+  .fs-icon-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: #EDEAE4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-bottom: 20px;
+    color: #5C4A2A;
+  }
+
+  .fs-title {
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2C2110;
+    margin: 0 0 8px;
+    line-height: 1.3;
+  }
+
+  .fs-desc {
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: #8A7A66;
+    line-height: 1.65;
+    margin: 0;
+    flex-grow: 1;
+  }
+
+  .fs-try-now {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #A07830;
+    transition: gap 0.2s ease;
+  }
+
+  .fs-try-arrow {
+    flex-shrink: 0;
+  }
+
+  /* ── Mobile snap track ── */
+  .fs-mobile-track {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-left: 24px;
+    padding-right: 24px;
+    scroll-padding-left: 24px;
+    scroll-padding-right: 24px;
+    padding-bottom: 4px;
+  }
+
+  .fs-mobile-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 88vw so the next card always peeks from the right */
+  .fs-mobile-slide {
+    flex-shrink: 0;
+    width: 88vw;
+    scroll-snap-align: start;
+  }
+
+  /* ── Section header ── */
+  .fs-section-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #A07830;
+    font-weight: 400;
+  }
+
+  .fs-section-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(24px, 3.5vw, 38px);
+    font-weight: 300;
+    color: #2C2110;
+    line-height: 1.2;
+    margin: 8px 0 0;
+  }
+
+  .fs-divider {
+    width: 36px;
+    height: 1px;
+    background: linear-gradient(to right, #C9A84C, #E8C97A);
+    margin: 12px auto 0;
+  }
+`;
 
 // ─── Shared Card ──────────────────────────────────────────────────────────────
 function ServiceCard({ title, description, href, Icon }: Service) {
   return (
-    <a
-      href={href}
-      className="flex flex-col bg-white rounded-2xl p-6 shadow-sm w-full no-underline"
-      style={{ border: `1px solid ${GOLD_BORDER}` }}
-    >
-      <div
-        className="w-14 h-14 flex items-center justify-center rounded-full mb-4"
-        style={{
-          border: `2px solid ${GOLD_BORDER}`,
-          backgroundColor: GOLD_LIGHT,
-        }}
-      >
-        <Icon size={24} strokeWidth={1.5} style={{ color: GOLD }} />
+    <a href={href} className="fs-card">
+      <div className="fs-icon-circle">
+        <Icon size={22} strokeWidth={1.5} />
       </div>
-      <h3
-        className="text-base font-semibold mb-2"
-        style={{ color: GOLD }}
-      >
-        {title}
-      </h3>
-      <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
+      <h3 className="fs-title">{title}</h3>
+      <p className="fs-desc">{description}</p>
+      <div className="fs-try-now">
+        <span>Try Now</span>
+        <svg
+          className="fs-try-arrow"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </div>
     </a>
   );
 }
 
-// ─── Mobile Infinite Carousel ─────────────────────────────────────────────────
-// Clone buffer: [LAST_CLONE, ...real items, FIRST_CLONE]
-const MOBILE_ITEMS = [services[services.length - 1], ...services, services[0]];
-
+// ─── Mobile Snap Carousel ─────────────────────────────────────────────────────
+// Native CSS scroll-snap — no JS touch logic, no hover effects,
+// gaps between cards, next card peeks from the right edge.
 function MobileCarousel() {
-  const [index, setIndex] = useState(1); // start at first real item
-  const [animated, setAnimated] = useState(true);
-  const touchStartX = useRef<number | null>(null);
-  const isTransitioning = useRef(false);
-
-  const activeDot = ((index - 1) + services.length) % services.length;
-
-  const goTo = useCallback((next: number, withAnim = true) => {
-    if (isTransitioning.current) return;
-    isTransitioning.current = true;
-    setAnimated(withAnim);
-    setIndex(next);
-  }, []);
-
-  const onTransitionEnd = useCallback(() => {
-    isTransitioning.current = false;
-    if (index === 0) {
-      // landed on left clone → jump to real last
-      setAnimated(false);
-      setIndex(services.length);
-    } else if (index === MOBILE_ITEMS.length - 1) {
-      // landed on right clone → jump to real first
-      setAnimated(false);
-      setIndex(1);
-    }
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => setAnimated(true))
-    );
-  }, [index]);
-
-  const prev = () => goTo(index - 1);
-  const next = () => goTo(index + 1);
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return;
-    const delta = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 40) {
-      if (delta > 0) {
-        next();
-      } else {
-        prev();
-      }
-    }
-    touchStartX.current = null;
-  };
-
   return (
-    <div className="md:hidden px-4">
-      {/* Sliding viewport */}
-      <div
-        className="overflow-hidden rounded-2xl"
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-      >
-        <div
-          className="flex will-change-transform"
-          style={{
-            transform: `translateX(-${index * 100}%)`,
-            transition: animated
-              ? `transform ${SLIDE_DURATION}ms ${SLIDE_EASE}`
-              : "none",
-          }}
-          onTransitionEnd={onTransitionEnd}
-        >
-          {MOBILE_ITEMS.map((service, i) => (
-            <div key={`${service.title}-${i}`} className="min-w-full">
-              <ServiceCard {...service} />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Dot indicators */}
-      <div className="flex justify-center gap-2 mt-4">
-        {services.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i + 1)}
-            aria-label={`Go to slide ${i + 1}`}
-            className="rounded-full transition-all duration-300"
-            style={{
-              width: i === activeDot ? "24px" : "8px",
-              height: "8px",
-              backgroundColor: i === activeDot ? GOLD : GOLD_BORDER,
-            }}
-          />
+    <div className="md:hidden">
+      <div className="fs-mobile-track">
+        {services.map((service) => (
+          <div key={service.href} className="fs-mobile-slide">
+            <ServiceCard {...service} />
+          </div>
         ))}
       </div>
     </div>
@@ -206,24 +247,19 @@ function MobileCarousel() {
 }
 
 // ─── Desktop Infinite Carousel ────────────────────────────────────────────────
-// Triple-clone trick: [...services, ...services, ...services]
-// Start scrollLeft at 1× single-copy width (middle copy).
-// Silently teleport when scrolling past the outer copies.
 function DesktopCarousel() {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const singleWidthRef = useRef(0);
-  const stepRef = useRef(STEP);
+  const stepRef = useRef(0);
   const rafRef = useRef<number | null>(null);
 
   const initScroll = useCallback((el: HTMLDivElement | null) => {
     if (!el) return;
     trackRef.current = el;
     requestAnimationFrame(() => {
-      const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || "0");
+      const gap = parseFloat(getComputedStyle(el).gap || "0");
       const firstCard = el.firstElementChild as HTMLElement | null;
-      if (firstCard) {
-        stepRef.current = firstCard.getBoundingClientRect().width + gap;
-      }
+      if (firstCard) stepRef.current = firstCard.getBoundingClientRect().width + gap;
       singleWidthRef.current = el.scrollWidth / 3;
       el.scrollLeft = singleWidthRef.current;
     });
@@ -234,105 +270,128 @@ function DesktopCarousel() {
     if (!el) return;
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
-      const singleWidth = singleWidthRef.current;
-      if (!singleWidth) return;
-      if (el.scrollLeft < singleWidth) {
-        el.scrollLeft += singleWidth;
-      } else if (el.scrollLeft >= singleWidth * 2) {
-        el.scrollLeft -= singleWidth;
-      }
+      const sw = singleWidthRef.current;
+      if (!sw) return;
+      if (el.scrollLeft < sw) el.scrollLeft += sw;
+      else if (el.scrollLeft >= sw * 2) el.scrollLeft -= sw;
     });
   }, []);
-
-  const scroll = (dir: "left" | "right") => {
-    trackRef.current?.scrollBy({
-      left: dir === "right" ? stepRef.current : -stepRef.current,
-      behavior: "smooth",
-    });
-  };
 
   useEffect(() => {
     const handleResize = () => {
       const el = trackRef.current;
       if (!el) return;
-      const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || "0");
+      const gap = parseFloat(getComputedStyle(el).gap || "0");
       const firstCard = el.firstElementChild as HTMLElement | null;
-      if (firstCard) {
-        stepRef.current = firstCard.getBoundingClientRect().width + gap;
-      }
+      if (firstCard) stepRef.current = firstCard.getBoundingClientRect().width + gap;
       singleWidthRef.current = el.scrollWidth / 3;
       el.scrollLeft = singleWidthRef.current;
     };
-
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  return (
-    <div className="hidden md:block max-w-6xl mx-auto relative px-10">
-      {/* Left Arrow */}
-      <button
-        onClick={() => scroll("left")}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md transition-all duration-200"
-        style={{ border: `1px solid ${GOLD}`, color: GOLD }}
-        onMouseEnter={(e) =>
-          (e.currentTarget.style.backgroundColor = GOLD_LIGHT)
-        }
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.backgroundColor = "white")
-        }
-        aria-label="Scroll left"
-      >
-        <ChevronLeft size={20} />
-      </button>
+  const scroll = (dir: "left" | "right") =>
+    trackRef.current?.scrollBy({
+      left: dir === "right" ? stepRef.current : -stepRef.current,
+      behavior: "smooth",
+    });
 
-      {/* Triple-cloned scrollable track */}
+  return (
+    <div className="hidden md:block max-w-6xl mx-auto px-10" style={{ position: "relative" }}>
+      <ArrowBtn dir="left" onClick={() => scroll("left")} />
       <div
         ref={initScroll}
         onScroll={handleScroll}
-        className="
-          flex gap-5 overflow-x-auto
-          [&::-webkit-scrollbar]:hidden
-          [scrollbar-width:none]
-          [-ms-overflow-style:none]
-        "
+        style={{
+          display: "flex",
+          gap: "20px",
+          overflowX: "auto",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          paddingTop: "12px",
+          paddingBottom: "12px",
+        }}
+        className="[&::-webkit-scrollbar]:hidden"
       >
         {[...services, ...services, ...services].map((service, i) => (
-          <div key={`${service.title}-${i}`} className="flex-shrink-0 w-[260px]">
+          <div key={`${service.href}-${i}`} style={{ flexShrink: 0, width: "280px" }}>
             <ServiceCard {...service} />
           </div>
         ))}
       </div>
-
-      {/* Right Arrow */}
-      <button
-        onClick={() => scroll("right")}
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md transition-all duration-200"
-        style={{ border: `1px solid ${GOLD}`, color: GOLD }}
-        onMouseEnter={(e) =>
-          (e.currentTarget.style.backgroundColor = GOLD_LIGHT)
-        }
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.backgroundColor = "white")
-        }
-        aria-label="Scroll right"
-      >
-        <ChevronRight size={20} />
-      </button>
+      <ArrowBtn dir="right" onClick={() => scroll("right")} />
     </div>
   );
 }
 
+const ArrowBtn = ({
+  dir,
+  onClick,
+}: {
+  dir: "left" | "right";
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    aria-label={dir === "left" ? "Scroll left" : "Scroll right"}
+    style={{
+      position: "absolute",
+      top: "50%",
+      transform: "translateY(-50%)",
+      [dir]: "-16px",
+      zIndex: 10,
+      width: "36px",
+      height: "36px",
+      borderRadius: "50%",
+      background: "#FFFFFF",
+      border: "1px solid #D9CDB8",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      color: "#A07830",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+      transition: "border-color 0.2s, background 0.2s",
+    }}
+    onMouseEnter={(e) => {
+      (e.currentTarget as HTMLButtonElement).style.borderColor = "#C9A84C";
+      (e.currentTarget as HTMLButtonElement).style.background = "#FAF8F4";
+    }}
+    onMouseLeave={(e) => {
+      (e.currentTarget as HTMLButtonElement).style.borderColor = "#D9CDB8";
+      (e.currentTarget as HTMLButtonElement).style.background = "#FFFFFF";
+    }}
+  >
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {dir === "left" ? <path d="M15 18l-6-6 6-6" /> : <path d="M9 18l6-6-6-6" />}
+    </svg>
+  </button>
+);
+
 // ─── Section ──────────────────────────────────────────────────────────────────
 export default function FreeServicesSection() {
   return (
-    <section className="bg-white py-10 md:py-16 pb-10">
-      <div className="max-w-6xl mx-auto text-center mb-8 md:mb-10 px-4">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#111111]">
-          Try Before You <span className="text-[#b8860b]">Talk</span>
+    <section style={{ backgroundColor: "#FAF8F4" }} className="py-12 md:py-16">
+      <style>{STYLES}</style>
+
+      {/* Header */}
+      <div className="text-center mb-10 px-4">
+        <p className="fs-section-label">Free Services</p>
+        <h2 className="fs-section-heading">
+          Try Before You <em>Talk</em>
         </h2>
-        <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
+        <div className="fs-divider" />
       </div>
 
       <MobileCarousel />

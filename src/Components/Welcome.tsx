@@ -1,5 +1,32 @@
 import { useEffect, useState } from "react";
 import welcomeScreenImage from "../assets/Welcome-screen-image.webp";
+import AquariusImg from "../assets/Header-images/Aquarius.webp";
+import AriesImg from "../assets/Header-images/Aries.webp";
+import CancerImg from "../assets/Header-images/Cancer.webp";
+import CapricornImg from "../assets/Header-images/Capricorn.webp";
+import GeminiImg from "../assets/Header-images/Gemini.webp";
+import LeoImg from "../assets/Header-images/Leo.webp";
+import LibraImg from "../assets/Header-images/Libra.webp";
+import PiscesImg from "../assets/Header-images/Pisces.webp";
+import SagittariusImg from "../assets/Header-images/Sagittarius.webp";
+import ScorpioImg from "../assets/Header-images/Scorpio.webp";
+import TaurusImg from "../assets/Header-images/Taurus.webp";
+import VirgoImg from "../assets/Header-images/Virgo.webp";
+
+const rashiImages = [
+  { name: "Aries", image: AriesImg },
+  { name: "Taurus", image: TaurusImg },
+  { name: "Gemini", image: GeminiImg },
+  { name: "Cancer", image: CancerImg },
+  { name: "Leo", image: LeoImg },
+  { name: "Virgo", image: VirgoImg },
+  { name: "Libra", image: LibraImg },
+  { name: "Scorpio", image: ScorpioImg },
+  { name: "Sagittarius", image: SagittariusImg },
+  { name: "Capricorn", image: CapricornImg },
+  { name: "Aquarius", image: AquariusImg },
+  { name: "Pisces", image: PiscesImg },
+];
 
 interface WelcomeScreenProps {
   onComplete?: () => void;
@@ -92,6 +119,12 @@ export default function WelcomeScreen({
       {/* ── Main layout ── */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 w-full h-full gap-0">
 
+        <div className="hidden" aria-hidden="true">
+          {rashiImages.map((rashi) => (
+            <img key={rashi.name} src={rashi.image} alt="" />
+          ))}
+        </div>
+
         {/* Overline */}
         <p
           className="font-['Cinzel',serif] text-[#c9a84c] tracking-[0.45em] uppercase mb-3"
@@ -100,30 +133,32 @@ export default function WelcomeScreen({
           Ancient Vedic Wisdom
         </p>
 
-        {/* Zodiac wheel */}
-        <div
-          className="relative flex-shrink-0"
-          style={{ width: "min(52vw,420px)", height: "min(52vw,420px)", animation: "wheel-appear 1.6s 0.6s cubic-bezier(0.16,1,0.3,1) both" }}
-          aria-hidden="true"
-        >
-          {/* Halos */}
-          <div className="absolute rounded-full border border-[rgba(201,168,76,0.2)]"
-               style={{ inset: "-10%", animation: "halo-pulse 3s ease-in-out infinite" }} />
-          <div className="absolute rounded-full border border-[rgba(201,168,76,0.1)]"
-               style={{ inset: "-22%", animation: "halo-pulse 3s 1.5s ease-in-out infinite" }} />
-          <img
-            src={wheelImageSrc}
-            alt="Vedastraa welcome illustration"
-            width={420}
-            height={420}
-            loading="eager"
-            decoding="async"
-            className="w-full h-full object-contain"
-            style={{
-              animation: "wheel-rotate 80s linear infinite",
-              filter: "drop-shadow(0 0 28px rgba(201,168,76,0.35)) drop-shadow(0 0 8px rgba(201,168,76,0.2))",
-            }}
-          />
+        <div className="relative flex-shrink-0 w-full flex items-center justify-center">
+          {/* Zodiac wheel */}
+          <div
+            className="relative flex-shrink-0 z-10"
+            style={{ width: "min(58vw,480px)", height: "min(58vw,480px)", animation: "wheel-appear 1.6s 0.6s cubic-bezier(0.16,1,0.3,1) both" }}
+            aria-hidden="true"
+          >
+            {/* Halos */}
+            <div className="absolute rounded-full border border-[rgba(201,168,76,0.2)]"
+                 style={{ inset: "-12%", animation: "halo-pulse 3s ease-in-out infinite" }} />
+            <div className="absolute rounded-full border border-[rgba(201,168,76,0.1)]"
+                 style={{ inset: "-26%", animation: "halo-pulse 3s 1.5s ease-in-out infinite" }} />
+            <img
+              src={wheelImageSrc}
+              alt="Vedastraa welcome illustration"
+              width={420}
+              height={420}
+              loading="eager"
+              decoding="async"
+              className="w-full h-full object-contain"
+              style={{
+                animation: "wheel-rotate 80s linear infinite",
+                filter: "drop-shadow(0 0 28px rgba(201,168,76,0.35)) drop-shadow(0 0 8px rgba(201,168,76,0.2))",
+              }}
+            />
+          </div>
         </div>
 
         {/* Brand block */}

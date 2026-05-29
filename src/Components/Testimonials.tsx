@@ -73,8 +73,176 @@ const reviews = [
   },
 ];
 
-// Duplicate array for seamless infinite loop
 const allReviews = [...reviews, ...reviews];
+
+const STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
+
+  /* ── Scroll animations ── */
+  @keyframes scrollLeft {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes scrollRight {
+    0%   { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+
+  .tstrip-row-left {
+    display: flex;
+    gap: 20px;
+    width: max-content;
+    animation: scrollLeft 40s linear infinite;
+  }
+  .tstrip-row-right {
+    display: flex;
+    gap: 20px;
+    width: max-content;
+    animation: scrollRight 40s linear infinite;
+  }
+
+  /* Pause on hover */
+  .tstrip-row-left:hover,
+  .tstrip-row-right:hover {
+    animation-play-state: paused;
+  }
+
+  /* ── Card ── */
+  .tstrip-card {
+    flex-shrink: 0;
+    width: 420px;
+    background: #1C2033;
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tstrip-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+    }
+  }
+
+  /* ── Decorative 99 quote mark ── */
+  .tstrip-quote-mark {
+    position: absolute;
+    top: 6px;
+    right: 22px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1;
+    color: #2A3050;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  /* ── Stars ── */
+  .tstrip-stars {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  /* ── Quote text ── */
+  .tstrip-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-style: italic;
+    font-weight: 300;
+    color: #E8E4DC;
+    line-height: 1.7;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ── Footer: avatar + name + location ── */
+  .tstrip-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .tstrip-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #3A3F58;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #A8A0B0;
+    letter-spacing: 0.04em;
+  }
+
+  .tstrip-name {
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #E8E4DC;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .tstrip-location {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #C9A84C;
+    margin: 4px 0 0;
+  }
+
+  /* ── Fade masks on both sides ── */
+  .tstrip-mask {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+
+  /* ── Section header ── */
+  .tstrip-section-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #A07830;
+    font-weight: 400;
+  }
+
+  .tstrip-section-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(24px, 3.5vw, 38px);
+    font-weight: 300;
+    color: #2C2110;
+    line-height: 1.25;
+    margin: 8px 0 0;
+  }
+
+  .tstrip-divider {
+    width: 36px;
+    height: 1px;
+    background: linear-gradient(to right, #C9A84C, #E8C97A);
+    margin: 12px auto 0;
+  }
+`;
 
 interface ReviewCardProps {
   name: string;
@@ -84,101 +252,85 @@ interface ReviewCardProps {
   avatar: string;
 }
 
+// ─── Single Card ──────────────────────────────────────────────────────────────
 function ReviewCard({ name, location, stars, text, avatar }: ReviewCardProps) {
   return (
-    <div
-      className="
-        flex-shrink-0
-        w-64 sm:w-72 md:w-80
-        bg-white
-        border border-amber-200
-        rounded-2xl
-        shadow-sm shadow-amber-50
-        p-4 md:p-5
-        flex flex-col gap-3
-      "
-    >
-      {/* Header: Avatar + Name + Location */}
-      <div className="flex items-center gap-3">
-        <div
-          className="
-            w-10 h-10 rounded-full flex-shrink-0
-            bg-gradient-to-br from-amber-100 to-yellow-200
-            border-2 border-amber-300
-            flex items-center justify-center
-            text-amber-700 font-bold text-xs
-          "
-        >
-          {avatar}
+    <div className="tstrip-card">
+      {/* Decorative quote mark */}
+      <span className="tstrip-quote-mark" aria-hidden="true">99</span>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+        {/* Stars */}
+        <div className="tstrip-stars">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <svg
+              key={i}
+              viewBox="0 0 24 24"
+              width="15"
+              height="15"
+              fill="none"
+              stroke={i < stars ? "#C9A84C" : "#2A3050"}
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+          ))}
         </div>
-        <div className="flex flex-col min-w-0">
-          <span className="text-sm font-semibold text-stone-800 truncate">
-            {name}
-          </span>
-          <span className="text-[11px] text-amber-500 font-medium">
-            {location}
-          </span>
-        </div>
+
+        {/* Quote text */}
+        <p className="tstrip-text">"{text}"</p>
       </div>
 
-      {/* Stars */}
-      <div className="flex items-center gap-0.5">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <svg
-            key={i}
-            viewBox="0 0 20 20"
-            className={`w-3.5 h-3.5 ${
-              i < stars ? "text-amber-400" : "text-stone-200"
-            }`}
-            fill="currentColor"
-          >
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-          </svg>
-        ))}
+      {/* Footer */}
+      <div className="tstrip-footer">
+        <div className="tstrip-avatar">{avatar}</div>
+        <div>
+          <p className="tstrip-name">{name}</p>
+          <p className="tstrip-location">{location}</p>
+        </div>
       </div>
-
-      {/* Review text */}
-      <p className="text-xs sm:text-sm text-stone-500 leading-relaxed line-clamp-4">
-        "{text}"
-      </p>
     </div>
   );
 }
 
+// ─── Section ──────────────────────────────────────────────────────────────────
 export default function TestimonialsStrip() {
   return (
-    <section className="w-full bg-white py-10 md:py-16 overflow-hidden">
+    <section
+      className="w-full py-12 md:py-16 overflow-hidden"
+      style={{ backgroundColor: "#FAF8F4" }}
+    >
+      <style>{STYLES}</style>
 
-      {/* Section Heading */}
-      <div className="text-center mb-8 md:mb-12 px-4">
-        <p className="text-xs tracking-[0.3em] uppercase text-amber-500 font-medium mb-2">
-          What People Say
-        </p>
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#111111] leading-tight">
-          Stories from the <span className="text-[#b8860b]">other side</span>
-          <br className="hidden sm:block" /> of the chat.
+      {/* Header */}
+      <div className="text-center mb-10 px-4">
+        <p className="tstrip-section-label">What People Say</p>
+        <h2 className="tstrip-section-heading">
+          Stories from the <em>Other Side</em>
+          <br />of the Chat.
         </h2>
-        <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
+        <div className="tstrip-divider" />
       </div>
 
       {/* Row 1 — scrolls left */}
-      <div className="mb-4 flex gap-4 [mask-image:linear-gradient(to_right,transparent,white_10%,white_90%,transparent)]">
-        <div className="flex gap-4 animate-scroll-left">
+      <div className="tstrip-mask mb-5 overflow-hidden" style={{ paddingTop: "12px" }}>
+        <div className="tstrip-row-left">
           {allReviews.map((r, i) => (
             <ReviewCard key={`row1-${i}`} {...r} />
           ))}
         </div>
       </div>
 
-      {/* Row 2 — scrolls right (reverse) */}
-      <div className="flex gap-4 [mask-image:linear-gradient(to_right,transparent,white_10%,white_90%,transparent)]">
-        <div className="flex gap-4 animate-scroll-right">
+      {/* Row 2 — scrolls right */}
+      <div className="tstrip-mask overflow-hidden" style={{ paddingTop: "12px", paddingBottom: "12px" }}>
+        <div className="tstrip-row-right">
           {[...allReviews].reverse().map((r, i) => (
             <ReviewCard key={`row2-${i}`} {...r} />
           ))}
         </div>
       </div>
-
     </section>
   );
 }

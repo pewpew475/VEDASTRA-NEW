@@ -1,4 +1,4 @@
-import Banner from "../Components/Banner"
+import Header from "../Components/Header"
 import Actionbutton from "../Components/Action-button"
 import Todayhoroscope from "../Components/Today-horoscope"
 import Freeservices from "../Components/Freeservices"
@@ -8,15 +8,11 @@ import SeoSection from "../Components/Seo-section"
 import Testimonials from "../Components/Testimonials"
 import FAQ from "../Components/FAQ"
 
-type HomeProps = {
-  bannerInitialDelayMs?: number;
-};
-
-function Home({ bannerInitialDelayMs = 3000 }: HomeProps) {
+function Home() {
   return (
     <div className="bg-white">
 
-        <Banner initialDelayMs={bannerInitialDelayMs} />
+        <Header />
         <Actionbutton />
         <Todayhoroscope />
         <Freeservices />

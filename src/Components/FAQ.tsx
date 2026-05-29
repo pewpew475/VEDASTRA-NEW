@@ -2,10 +2,6 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-const GOLD = "#b8860b";
-const GOLD_LIGHT = "#fef9e7";
-const GOLD_BORDER = "#e8c44a";
-
 interface FaqItem {
   question: string;
   answer: string;
@@ -38,6 +34,183 @@ const faqs: FaqItem[] = [
   },
 ];
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
+const STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
+
+  /* ── Section header ── */
+  .faq-section-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #A07830;
+    font-weight: 400;
+  }
+
+  .faq-section-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(26px, 4vw, 42px);
+    font-weight: 300;
+    color: #2C2110;
+    line-height: 1.2;
+    margin: 8px 0 0;
+  }
+
+  .faq-divider {
+    width: 36px;
+    height: 1px;
+    background: linear-gradient(to right, #C9A84C, #E8C97A);
+    margin: 12px auto 0;
+  }
+
+  /* ── FAQ list ── */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* ── FAQ item ── */
+  .faq-item {
+    background: #FFFFFF;
+    border: 1px solid #E8E2D6;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .faq-item.open {
+    border-color: #C9A84C;
+    box-shadow: 0 4px 20px rgba(160, 120, 48, 0.10);
+  }
+
+  /* ── FAQ trigger ── */
+  .faq-trigger {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s ease;
+  }
+
+  .faq-item.open .faq-trigger {
+    background: #FDFAF5;
+  }
+
+  /* ── Index badge ── */
+  .faq-badge {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #D9CDB8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #A07830;
+    background: #FAF8F4;
+    margin-top: 1px;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .faq-item.open .faq-badge {
+    background: #A07830;
+    border-color: #A07830;
+    color: #FFFFFF;
+  }
+
+  /* ── Question text ── */
+  .faq-question {
+    flex: 1;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2C2110;
+    line-height: 1.5;
+    transition: color 0.2s ease;
+    padding-top: 3px;
+  }
+
+  .faq-item.open .faq-question {
+    color: #A07830;
+  }
+
+  /* ── Chevron icon ── */
+  .faq-icon {
+    flex-shrink: 0;
+    margin-top: 3px;
+    color: #C0B090;
+    transition: color 0.2s ease;
+  }
+
+  .faq-item.open .faq-icon {
+    color: #A07830;
+  }
+
+  /* ── Answer panel ── */
+  .faq-answer {
+    padding: 0 24px 22px 68px;
+    border-top: 1px solid #F0EAE0;
+    background: #FDFAF5;
+  }
+
+  .faq-answer p {
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: #6A5C48;
+    line-height: 1.85;
+    margin: 16px 0 0;
+  }
+
+  /* ── Bottom CTA ── */
+  .faq-cta-text {
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: #B0A090;
+    text-align: center;
+    margin-top: 36px;
+  }
+
+  .faq-cta-link {
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #A07830;
+    text-decoration: none;
+    border-bottom: 1px solid #C9A84C;
+    padding-bottom: 1px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .faq-cta-link:hover {
+    color: #7A5C18;
+    border-color: #7A5C18;
+  }
+
+  @media (max-width: 640px) {
+    .faq-trigger {
+      padding: 16px 18px;
+      gap: 12px;
+    }
+    .faq-answer {
+      padding: 0 18px 18px 58px;
+    }
+  }
+`;
+
+// ─── FAQ Card ─────────────────────────────────────────────────────────────────
 function FaqCard({
   item,
   index,
@@ -50,77 +223,57 @@ function FaqCard({
   onToggle: () => void;
 }) {
   return (
-    <div
-      className="rounded-2xl border overflow-hidden transition-all duration-300"
-      style={{
-        borderColor: isOpen ? GOLD_BORDER : "#e5e7eb",
-        boxShadow: isOpen ? "0 4px 20px rgba(184,134,11,0.12)" : "none",
-      }}
-    >
-      <button
-        className="w-full flex items-start gap-4 px-5 py-4 md:px-6 md:py-5 text-left transition-colors duration-200"
-        style={{ background: isOpen ? GOLD_LIGHT : "#fff" }}
-        onClick={onToggle}
-      >
+    <div className={`faq-item${isOpen ? " open" : ""}`}>
+      <button className="faq-trigger" onClick={onToggle} aria-expanded={isOpen}>
         {/* Index badge */}
-        <span
-          className="flex-shrink-0 mt-0.5 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
-          style={{ background: `linear-gradient(135deg, #e8c44a, ${GOLD})` }}
-        >
+        <span className="faq-badge">
           {String(index + 1).padStart(2, "0")}
         </span>
-        {/* Question text */}
-        <span
-          className="flex-1 font-semibold text-sm md:text-base leading-snug"
-          style={{ color: isOpen ? GOLD : "#1f2937" }}
-        >
-          {item.question}
-        </span>
-        {/* Toggle icon */}
-        <span className="flex-shrink-0 mt-0.5">
-          {isOpen ? (
-            <ChevronUp size={18} style={{ color: GOLD }} />
-          ) : (
-            <ChevronDown size={18} className="text-gray-400" />
-          )}
+
+        {/* Question */}
+        <span className="faq-question">{item.question}</span>
+
+        {/* Chevron */}
+        <span className="faq-icon">
+          {isOpen
+            ? <ChevronUp size={17} />
+            : <ChevronDown size={17} />}
         </span>
       </button>
-      {/* Answer panel */}
+
+      {/* Answer */}
       {isOpen && (
-        <div
-          className="px-5 pb-5 pt-1 md:px-6 md:pb-6 text-sm md:text-base text-gray-600 leading-relaxed"
-          style={{ background: GOLD_LIGHT, borderTop: `1px solid ${GOLD_BORDER}` }}
-        >
-          <div className="ml-11">{item.answer}</div>
+        <div className="faq-answer">
+          <p>{item.answer}</p>
         </div>
       )}
     </div>
   );
 }
 
+// ─── Section ──────────────────────────────────────────────────────────────────
 export default function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggle = (i: number) => setOpenIndex(openIndex === i ? null : i);
 
   return (
-    // ✅ FIX: Restored symmetric py-14 md:py-20 — no more pt-8 hack needed
-    // because Seo-section-6 is now fixed at the source (pb-0 on mobile).
-    <section className="bg-white py-14 md:py-20 px-4 -mb-px">
-      <div className="max-w-3xl mx-auto">
-        {/* Section header */}
-        <div className="text-center mb-10 md:mb-14">
-          <p className="uppercase tracking-widest text-xs md:text-sm font-semibold mb-3" style={{ color: GOLD }}>
-            Got Questions?
-          </p>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#111111]">
-            Frequently Asked <span className="text-[#b8860b]">Questions</span>
+    <section style={{ backgroundColor: "#FAF8F4" }} className="py-12 md:py-20 px-4">
+      <style>{STYLES}</style>
+
+      <div style={{ maxWidth: "720px", margin: "0 auto" }}>
+
+        {/* Header */}
+        <div className="text-center mb-10">
+          <p className="faq-section-label">Got Questions?</p>
+          <h2 className="faq-section-heading">
+            Frequently Asked <em>Questions</em>
           </h2>
-          <div className="mx-auto mt-2 h-[2px] w-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600" />
+          <div className="faq-divider" />
         </div>
 
         {/* FAQ list */}
-        <div className="space-y-3">
+        <div className="faq-list">
           {faqs.map((faq, i) => (
             <FaqCard
               key={i}
@@ -132,17 +285,14 @@ export default function FaqSection() {
           ))}
         </div>
 
-        {/* Bottom CTA hint */}
-        <p className="mt-10 text-center text-sm text-gray-400">
+        {/* Bottom CTA */}
+        <p className="faq-cta-text">
           Still have questions?{" "}
-          <a
-            href="/contact"
-            className="font-semibold underline underline-offset-2 transition-colors duration-200"
-            style={{ color: GOLD }}
-          >
+          <a href="/contact" className="faq-cta-link">
             Talk to an astrologer
           </a>
         </p>
+
       </div>
     </section>
   );

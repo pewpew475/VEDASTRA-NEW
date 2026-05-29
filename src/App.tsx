@@ -8,7 +8,6 @@ import BottomNav from "./Components/Bottom-nav";
 function App() {
   const [showWelcome, setShowWelcome] = useState(true);
   const welcomeDurationMs = 6000;
-  const bannerInitialDelayMs = welcomeDurationMs + 5000;
 
   useEffect(() => {
     const previousBodyOverflow = document.body.style.overflow;
@@ -40,7 +39,7 @@ function App() {
 
       <Navbar />
       <div>
-        <Home bannerInitialDelayMs={bannerInitialDelayMs} />
+        <Home />
       </div>
       <BottomNav />
       <Footer />
